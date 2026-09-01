@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# 允许跨域请求（解决网页端连接波动与拦截问题）
+# 允许跨域请求
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -111,6 +111,7 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 async def api_chat(req: ChatRequest):
+    global conversation_history
     user_text = req.prompt.strip()
     u = user_text.lower()
     
@@ -136,7 +137,6 @@ async def api_chat(req: ChatRequest):
 
         conversation_history.append({"role": "user", "content": user_prompt})
         if len(conversation_history) > 11:
-            global conversation_history
             conversation_history = [conversation_history[0]] + conversation_history[-10:]
 
         reply_text = "抱歉先生，网络神经链路刚刚产生轻微波动。"
